@@ -48,3 +48,7 @@ In your GTM container, add:
 - **Meta Pixel Lead event** — trigger: Custom Event = `form_submit`.
 - **Google Ads conversion** — trigger: Custom Event = `coupon_download`, value = 50, currency = EUR.
 - **Consent Mode v2** — built-in consent settings, read from `consent_update` event.
+- **Scroll Depth (scroll_75)** — Use the built-in Scroll Depth trigger, set threshold to 75%. This fires a `scroll_75` event into the dataLayer when a user scrolls 75% down the page.
+
+### GTM Enhanced Measurement
+In GA4, enable **Enhanced Measurement** to auto-track scrolls, file downloads, outbound clicks, and video engagement. The site's custom scroll_75 event will fire alongside GA4's built-in scroll event if both are configured.

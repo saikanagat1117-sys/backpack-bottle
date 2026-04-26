@@ -5,6 +5,12 @@ import { LocaleProvider } from "@/components/LocaleProvider";
 import { GTMHead, GTMNoScript } from "@/components/GTM";
 import CookieBanner from "@/components/CookieBanner";
 import VisitCounter from "@/components/VisitCounter";
+import Clarity from "@/components/Clarity";
+import RageClickDetector from "@/components/RageClickDetector";
+import OutboundLinkTracker from "@/components/OutboundLinkTracker";
+import ReadingTimeTracker from "@/components/ReadingTimeTracker";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces", display: "swap" });
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -26,14 +32,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="it" className={`${fraunces.variable} ${inter.variable}`}>
       <head>
         <GTMHead />
+        <Clarity />
       </head>
       <body className="font-sans">
         <GTMNoScript />
         <LocaleProvider>
           <VisitCounter />
+          <RageClickDetector />
+          <OutboundLinkTracker />
+          <ReadingTimeTracker />
           {children}
           <CookieBanner />
         </LocaleProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

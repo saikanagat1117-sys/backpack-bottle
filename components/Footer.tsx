@@ -21,7 +21,6 @@ export default function Footer() {
             <li><a href="#destinazioni">{t.nav.destinations[locale]}</a></li>
             <li><a href="#come-funziona">{t.nav.how[locale]}</a></li>
             <li><Link href="/blog">{t.nav.blog[locale]}</Link></li>
-            <li><Link href="/measurement">Measurement plan</Link></li>
           </ul>
         </div>
         <div>

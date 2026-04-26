@@ -15,7 +15,6 @@ export default function Nav() {
           <a href="#destinazioni" className="hover:text-forest">{t.nav.destinations[locale]}</a>
           <a href="#come-funziona" className="hover:text-forest">{t.nav.how[locale]}</a>
           <Link href="/blog" className="hover:text-forest">{t.nav.blog[locale]}</Link>
-          <Link href="/measurement" className="hover:text-forest text-burnt/90">Measurement</Link>
         </nav>
         <div className="flex items-center gap-3">
           <button

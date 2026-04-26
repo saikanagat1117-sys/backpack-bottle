@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "./LocaleProvider";
 import { t, destinations } from "@/lib/content";
@@ -10,12 +10,32 @@ export default function LeadForm() {
   const router = useRouter();
   const [status, setStatus] = useState<"idle" | "sending" | "error">("idle");
   const [started, setStarted] = useState(false);
+  const sectionRef = useRef<HTMLElement | null>(null);
 
-  const onFocus = () => {
+  useEffect(() => {
+    if (!sectionRef.current) return;
+    const obs = new IntersectionObserver(
+      (entries) => entries.forEach((e) => {
+        if (e.isIntersecting) {
+          track("form_view", { form: "coupon_lead" });
+          obs.disconnect();
+        }
+      }),
+      { threshold: 0.4 }
+    );
+    obs.observe(sectionRef.current);
+    return () => obs.disconnect();
+  }, []);
+
+  const onFocus = (field?: string) => {
     if (!started) {
       track("form_start", { form: "coupon_lead" });
       setStarted(true);
     }
+    if (field) track("form_field_focus", { field });
+  };
+  const onBlurField = (field: string, val: string) => {
+    if (val) track("form_field_blur", { field, filled: true });
   };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -32,13 +52,14 @@ export default function LeadForm() {
       track("form_submit", { form: "coupon_lead", destination: data.interest });
       track("coupon_download", { coupon_code: "BB50", value: 50, currency: "EUR" });
       router.push("/grazie");
-    } catch {
+    } catch (err) {
+      track("form_submit_error", { error: String(err).slice(0, 80) });
       setStatus("error");
     }
   };
 
   return (
-    <section id="coupon" className="bg-forest-dark text-cream py-20 md:py-28">
+    <section ref={sectionRef} id="coupon" className="bg-forest-dark text-cream py-20 md:py-28">
       <div className="container-x grid lg:grid-cols-2 gap-14 items-center">
         <div>
           <div className="inline-block text-xs uppercase tracking-[0.18em] text-burnt mb-4">
@@ -63,7 +84,7 @@ export default function LeadForm() {
               <input
                 required
                 name="name"
-                onFocus={onFocus}
+                onFocus={() => onFocus()}
                 className="mt-1 w-full border-b border-forest/30 bg-transparent py-2 focus:outline-none focus:border-burnt"
               />
             </label>
@@ -73,7 +94,7 @@ export default function LeadForm() {
                 required
                 type="email"
                 name="email"
-                onFocus={onFocus}
+                onFocus={() => onFocus()}
                 className="mt-1 w-full border-b border-forest/30 bg-transparent py-2 focus:outline-none focus:border-burnt"
               />
             </label>
@@ -82,7 +103,7 @@ export default function LeadForm() {
             <span className="text-xs uppercase tracking-wider text-forest/70">{t.form.city[locale]}</span>
             <select
               name="departure"
-              onFocus={onFocus}
+              onFocus={() => onFocus()}
               className="mt-1 w-full border-b border-forest/30 bg-transparent py-2 focus:outline-none focus:border-burnt"
             >
               <option>Milano</option>
@@ -96,7 +117,7 @@ export default function LeadForm() {
             <span className="text-xs uppercase tracking-wider text-forest/70">{t.form.interest[locale]}</span>
             <select
               name="interest"
-              onFocus={onFocus}
+              onFocus={() => onFocus()}
               className="mt-1 w-full border-b border-forest/30 bg-transparent py-2 focus:outline-none focus:border-burnt"
             >
               {destinations.map((d) => (

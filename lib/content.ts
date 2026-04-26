@@ -1,6 +1,10 @@
 export type Locale = "it" | "en";
 
-export const destinations = [
+// Re-export rich destinations from /lib/destinations.ts
+export { destinations, destinationBySlug } from "./destinations";
+
+// Legacy (kept for backwards compat in case anywhere imports it directly)
+export const _legacyDestinations = [
   {
     slug: "rome",
     city: { it: "Roma", en: "Rome" },

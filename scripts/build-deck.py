@@ -1014,6 +1014,123 @@ def s_links(s, idx, total):
 
 
 @slide
+def s_clarity(s, idx, total):
+    header(s, "Behavioural insight: Microsoft Clarity", "Heatmaps + session recordings + rage clicks — free, unlimited, GDPR-compliant", dark=True)
+    add_text(s, Inches(0.6), Inches(2.4), Inches(12), Inches(0.5),
+             "Where GA4 tells you 'what happened', Clarity tells you 'why'. We added it on top of GA4 — same consent gate, no extra cookies for the user.",
+             size=12, color=CREAM, font="Inter")
+    rows = [
+        ("Click heatmaps", "Where users click on every page", "Find dead zones + ignored CTAs"),
+        ("Move heatmaps", "Mouse-tracking attention map", "Where attention concentrates"),
+        ("Scroll heatmaps", "How far users actually scroll", "Decide what content lives above the fold"),
+        ("Session recordings", "Replay full anonymised sessions", "Diagnose form abandonment + UX bugs"),
+        ("Rage clicks", "3+ clicks in same area within 1s", "Frustration moments flagged automatically"),
+        ("Dead clicks", "Clicks that didn't change DOM", "Broken interactions — false affordances"),
+        ("Quick backs", "Land + leave under 3s", "Bounce-rate quality signal"),
+        ("Smart segments", "Auto-built audience cohorts", "Find your power users instantly"),
+    ]
+    add_table(s, Inches(0.6), Inches(3.1), Inches(12.1), Inches(3.6),
+              ["Signal", "What it captures", "What we do with it"], rows,
+              header_fill=BURNT, header_text=CREAM, body_text=FOREST, font_size=10)
+    add_text(s, Inches(0.6), Inches(6.8), Inches(12), Inches(0.4),
+             "Plus: we mirror our custom dataLayer events into Clarity tags, so we can filter session recordings by 'rage_click users' or 'high-intent leads who didn't submit.'",
+             size=11, color=CREAM, font="Inter")
+    footer(s, idx, total, dark=True)
+
+
+@slide
+def s_full_event_matrix(s, idx, total):
+    header(s, "Full interaction tracking matrix", "40+ trackable events across 9 categories")
+    rows = [
+        ("Acquisition", "page_view, visit_count_set, site_search, language_toggle"),
+        ("Engagement", "scroll_50, scroll_75, time_on_page (30/60/120/300s), engaged_session"),
+        ("Intent / CTAs", "cta_click, nav_click"),
+        ("Catalogue", "destination_card_click, destination_detail_view, destination_filter, related_destination_click, gallery_view"),
+        ("Decision", "comparison_open, comparison_add, comparison_remove, pricing_filter, currency_change"),
+        ("Form / lead", "form_view, form_start, form_field_focus, form_field_blur, form_validation_error, form_submit, form_submit_error, coupon_download, thank_you_view, newsletter_signup"),
+        ("Content", "faq_open"),
+        ("Sharing / outbound", "share_click, outbound_click, pdf_download, mailto_click, tel_click"),
+        ("Behavioural", "rage_click, dead_click, console_error"),
+        ("Privacy", "consent_update"),
+        ("Media (optional)", "video_play, video_pause, video_complete"),
+    ]
+    add_table(s, Inches(0.6), Inches(2.4), Inches(12.1), Inches(4.4),
+              ["Category", "Events"], rows, font_size=10)
+    add_text(s, Inches(0.6), Inches(6.9), Inches(12), Inches(0.4),
+             "Live glossary: backpack-bottle.vercel.app/tracking",
+             size=11, bold=True, color=BURNT, font="Inter")
+    footer(s, idx, total)
+
+
+@slide
+def s_destination_detail(s, idx, total):
+    header(s, "Destination detail experience", "10 cities, each a fully realised page")
+    add_text(s, Inches(0.6), Inches(2.4), Inches(12), Inches(0.5),
+             "Each destination has its own URL: /destinazioni/[slug]. Cinematic hero, intro, gallery, neighborhoods, day-by-day itinerary, food picks, what's included, weather + budget tips, FAQ, related cities.",
+             size=12, color=FOREST, font="Inter")
+    cities = ["Roma 🇮🇹", "Barcellona 🇪🇸", "Amsterdam 🇳🇱", "Lisbona 🇵🇹", "Praga 🇨🇿", "Parigi 🇫🇷", "Vienna 🇦🇹", "Berlino 🇩🇪", "Copenaghen 🇩🇰", "Atene 🇬🇷"]
+    y = Inches(3.2)
+    for i, c in enumerate(cities):
+        col = i % 5
+        row = i // 5
+        x = Inches(0.6 + col * 2.55)
+        yy = y + Inches(row * 0.8)
+        add_rounded(s, x, yy, Inches(2.4), Inches(0.65), CREAM)
+        add_text(s, x + Inches(0.2), yy + Inches(0.18), Inches(2.0), Inches(0.4),
+                 c, size=12, bold=True, color=FOREST, font="Inter")
+    sections = [
+        "Hero with cinematic image + flag + price + flight time + season",
+        "Intro: why this city, why our package, neighborhoods picked",
+        "Gallery (3 curated images with click tracking)",
+        "Day-by-day itinerary with timed suggestions",
+        "Three food addresses you can't miss",
+        "What's included + budget tip + weather hint",
+        "FAQ accordion (city-specific)",
+        "Sticky CTA: 'Get €50 off [city]'",
+        "Related cities cross-sell",
+    ]
+    add_text(s, Inches(0.6), Inches(5.2), Inches(12), Inches(0.4),
+             "EVERY DETAIL PAGE INCLUDES", size=10, bold=True, color=BURNT, font="Inter")
+    add_text(s, Inches(0.6), Inches(5.6), Inches(12), Inches(1.5),
+             " • " + "\n • ".join(sections), size=10, color=FOREST, font="Inter")
+    footer(s, idx, total)
+
+
+@slide
+def s_zapier_flow(s, idx, total):
+    header(s, "Lead-to-customer automation chain", "Zapier orchestrates the moment after submit", dark=True)
+    add_text(s, Inches(0.6), Inches(2.4), Inches(12), Inches(0.5),
+             "Form submit → Vercel API → Zapier webhook → 5-way fan-out: Mailchimp, Sheets, Slack, Meta CAPI, internal log.",
+             size=12, color=CREAM, font="Inter")
+    diagram = (
+        "                              POST /api/lead\n"
+        "                                    │\n"
+        "                                    ▼\n"
+        "                          Zapier 'Catch B&B lead'\n"
+        "                                    │\n"
+        "          ┌─────────┬─────────┬─────────┬──────────┐\n"
+        "          ▼           ▼           ▼           ▼            ▼\n"
+        "      Mailchimp     Google      Slack       Meta CAPI    Internal\n"
+        "      (welcome      Sheets      #bb-leads   server-side  Vercel\n"
+        "       series)      master      alert       Lead event   logs\n"
+        "          │\n"
+        "          ▼\n"
+        "    T+0:  Coupon delivery\n"
+        "    T+1d: Welcome + brand intro\n"
+        "    T+3d: Destination deep-dive (personalised on 'interest')\n"
+        "    T+7d: Booking psychology\n"
+        "    Tue:  Weekly deal alert\n"
+        "    T+30: Reminder if no booking\n"
+        "    T+83: Expiry warning (7 days left)\n"
+        "    T+45: Re-engage if dormant"
+    )
+    add_rounded(s, Inches(0.6), Inches(3.0), Inches(12.1), Inches(4.0), FOREST_DK)
+    add_text(s, Inches(0.9), Inches(3.1), Inches(11.5), Inches(3.9),
+             diagram, size=9, color=CREAM, font="Courier New")
+    footer(s, idx, total, dark=True)
+
+
+@slide
 def s_thanks(s, idx, total):
     add_bg(s, FOREST)
     add_rect(s, Inches(0.6), Inches(0.55), Inches(0.4), Pt(2), BURNT)

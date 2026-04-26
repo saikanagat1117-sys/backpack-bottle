@@ -1,0 +1,172 @@
+{
+  "name": "Backpack & Bottle — lead automation chain",
+  "description": "Triggered by /api/lead webhook. Branches into ESP + Sheet + Slack + Meta CAPI.",
+  "version": "1.0.0",
+  "trigger": {
+    "type": "webhook_catch",
+    "name": "Catch B&B lead",
+    "expected_payload": {
+      "ts": "2026-04-27T10:00:00Z",
+      "name": "Giulia M.",
+      "email": "giulia@example.com",
+      "departure": "Milano",
+      "interest": "barcelona",
+      "consent": "yes",
+      "locale": "it",
+      "source": "https://backpack-bottle.vercel.app/"
+    }
+  },
+  "steps": [
+    {
+      "id": "1_validate",
+      "type": "filter",
+      "rule": "consent == 'yes' AND email matches email regex"
+    },
+    {
+      "id": "2_enrich",
+      "type": "code",
+      "language": "javascript",
+      "comment": "Add UTC, derive segment, format display name",
+      "snippet": "const segment = inputData.interest === 'newsletter' ? 'newsletter_only' : 'coupon_lead';\nreturn { ...inputData, segment, signed_up_at: new Date().toISOString() };"
+    },
+    {
+      "id": "3_mailchimp",
+      "type": "mailchimp_add_subscriber",
+      "audience": "Backpack & Bottle leads",
+      "tags_from_field": ["interest", "departure", "segment"],
+      "merge_fields": {
+        "FNAME": "{{name}}",
+        "DEPART": "{{departure}}",
+        "INTEREST": "{{interest}}",
+        "LOCALE": "{{locale}}"
+      },
+      "double_optin": true
+    },
+    {
+      "id": "4_sheets",
+      "type": "google_sheets_append_row",
+      "spreadsheet": "Backpack & Bottle — leads master",
+      "worksheet": "Leads",
+      "columns": ["signed_up_at", "name", "email", "departure", "interest", "locale", "source", "segment"]
+    },
+    {
+      "id": "5_slack",
+      "type": "slack_send_channel_message",
+      "channel": "#bb-leads",
+      "text": "🎒🍷 New lead: *{{name}}* ({{email}}) — interested in *{{interest}}* — from {{departure}}",
+      "filter": "every Nth lead OR every 30 minutes (rate-limit)"
+    },
+    {
+      "id": "6_meta_capi",
+      "type": "webhook_post",
+      "url": "https://graph.facebook.com/v18.0/{{META_PIXEL_ID}}/events?access_token={{META_CAPI_TOKEN}}",
+      "comment": "Server-side Meta Conversions API mirror of the client-side Lead event for iOS 14+ accuracy",
+      "body": {
+        "data": [
+          {
+            "event_name": "Lead",
+            "event_time": "{{epoch}}",
+            "event_source_url": "{{source}}",
+            "action_source": "website",
+            "user_data": {
+              "em": "[hashed_email]",
+              "fn": "[hashed_first_name]"
+            },
+            "custom_data": {
+              "currency": "EUR",
+              "value": 50,
+              "content_name": "{{interest}}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "7_delay",
+      "type": "delay",
+      "duration_minutes": 1
+    },
+    {
+      "id": "8_send_coupon_email",
+      "type": "gmail_or_mailchimp_send",
+      "template_id": "bb_welcome_coupon",
+      "to": "{{email}}",
+      "subject": "Il tuo coupon BB50 — €50 sulla tua prossima city break",
+      "personalisation": {
+        "first_name": "{{name}}",
+        "destination_hint": "{{interest}}"
+      }
+    },
+    {
+      "id": "9_branch_no_redeem",
+      "type": "schedule_check",
+      "after_days": 30,
+      "condition": "no booking_event for this email in the last 30 days",
+      "action": "send template bb_reminder_30d"
+    },
+    {
+      "id": "10_branch_expiry",
+      "type": "schedule_check",
+      "after_days": 83,
+      "condition": "no booking_event for this email",
+      "action": "send template bb_expiry_warning (7 days left)"
+    }
+  ],
+  "templates": [
+    {
+      "id": "bb_welcome_coupon",
+      "subject_it": "Il tuo coupon BB50 è arrivato 🎒🍷",
+      "subject_en": "Your BB50 coupon is here 🎒🍷",
+      "body_summary": "Coupon code BB50 + branded PDF + 5 destinations link"
+    },
+    {
+      "id": "bb_destination_deepdive",
+      "subject_it": "{{destination}}, fatto bene: il nostro itinerario di 3 giorni",
+      "subject_en": "{{destination}}, done right: our 3-day plan",
+      "body_summary": "Pulled from /destinazioni/[slug], hero image + key tips + book CTA",
+      "schedule": "T+3 days"
+    },
+    {
+      "id": "bb_booking_psychology",
+      "subject_it": "Quando prenotare il tuo volo (dati 2026)",
+      "subject_en": "When to book your flight (2026 data)",
+      "body_summary": "Links to /blog/quando-prenotare-voli-europa",
+      "schedule": "T+7 days"
+    },
+    {
+      "id": "bb_weekly_deal",
+      "subject_it": "Una destinazione · una storia · un prezzo",
+      "subject_en": "One destination · one story · one price",
+      "body_summary": "Single curated package each Tuesday 10am",
+      "schedule": "every Tuesday 10:00 Europe/Rome"
+    },
+    {
+      "id": "bb_reminder_30d",
+      "subject_it": "Hai ancora 60 giorni per usare il tuo coupon",
+      "subject_en": "You still have 60 days to use your coupon",
+      "body_summary": "Soft urgency + 3 picks based on declared destination interest",
+      "schedule": "T+30 days · only if not redeemed"
+    },
+    {
+      "id": "bb_expiry_warning",
+      "subject_it": "Ultimi 7 giorni per il tuo €50",
+      "subject_en": "7 days left on your €50",
+      "body_summary": "Strong urgency · final reminder",
+      "schedule": "T+83 days · only if not redeemed"
+    },
+    {
+      "id": "bb_reengage_no_action",
+      "subject_it": "Cosa ti sta fermando?",
+      "subject_en": "What's stopping you?",
+      "body_summary": "Single-question survey + offer to chat with concierge",
+      "schedule": "T+45 days · only if no engagement (no opens for 21 days)"
+    }
+  ],
+  "kpis_to_track_in_zap": [
+    "leads_per_day",
+    "double_optin_completion_rate",
+    "slack_alerts_sent",
+    "ESP_send_failures",
+    "Meta_CAPI_match_rate"
+  ]
+}
