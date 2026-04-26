@@ -5,6 +5,7 @@ import { LocaleProvider } from "@/components/LocaleProvider";
 import { GTMHead, GTMNoScript } from "@/components/GTM";
 import CookieBanner from "@/components/CookieBanner";
 import VisitCounter from "@/components/VisitCounter";
+import { Analytics } from "@vercel/analytics/next";
 
 const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces", display: "swap" });
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
           <CookieBanner />
         </LocaleProvider>
+        <Analytics />
       </body>
     </html>
   );
