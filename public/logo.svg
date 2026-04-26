@@ -1,0 +1,10 @@
+<svg width="320" height="80" viewBox="0 0 320 80" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(8 24)">
+    <path d="M8 11c0-3 2-5 5-5h0c2 0 3 1 3 3v2" stroke="#1F3A2E" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+    <rect x="6" y="10" width="13" height="16" rx="3" stroke="#1F3A2E" stroke-width="1.5" fill="none"/>
+    <line x1="6" y1="17" x2="19" y2="17" stroke="#1F3A2E" stroke-width="1.2"/>
+    <path d="M22 8v3c0 .5.3.9.7 1.3l1.6 1.6c.4.4.7.9.7 1.5V25c0 1.1-.9 2-2 2h-2c-1.1 0-2-.9-2-2v-9.6c0-.6.3-1.1.7-1.5l1.6-1.6c.4-.4.7-.8.7-1.3V8" stroke="#D97642" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <line x1="21" y1="8" x2="25" y2="8" stroke="#D97642" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+  <text x="52" y="48" font-family="Georgia, serif" font-size="24" fill="#1F3A2E" font-weight="500">backpack <tspan fill="#D97642">&amp;</tspan> bottle</text>
+</svg>
