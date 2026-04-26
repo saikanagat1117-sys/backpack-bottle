@@ -15,12 +15,21 @@ export default function CookieBanner() {
 
   function pushConsent(granted: boolean) {
     window.dataLayer = window.dataLayer || [];
+    const state = granted ? "granted" : "denied";
+    // Native gtag consent update — required for GA4 to flip consent state
+    window.dataLayer.push("consent", "update", {
+      ad_storage: state,
+      analytics_storage: state,
+      ad_user_data: state,
+      ad_personalization: state,
+    });
+    // Custom event mirror for GTM triggers + Clarity
     window.dataLayer.push({
       event: "consent_update",
-      ad_storage: granted ? "granted" : "denied",
-      analytics_storage: granted ? "granted" : "denied",
-      ad_user_data: granted ? "granted" : "denied",
-      ad_personalization: granted ? "granted" : "denied",
+      ad_storage: state,
+      analytics_storage: state,
+      ad_user_data: state,
+      ad_personalization: state,
     });
   }
 
