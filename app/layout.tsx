@@ -3,6 +3,7 @@ import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
 import { LocaleProvider } from "@/components/LocaleProvider";
 import { GTMHead, GTMNoScript } from "@/components/GTM";
+import GA4 from "@/components/GA4";
 import CookieBanner from "@/components/CookieBanner";
 import VisitCounter from "@/components/VisitCounter";
 import Clarity from "@/components/Clarity";
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="it" className={`${fraunces.variable} ${inter.variable}`}>
       <head>
         <GTMHead />
+        <GA4 />
         <Clarity />
       </head>
       <body className="font-sans">
