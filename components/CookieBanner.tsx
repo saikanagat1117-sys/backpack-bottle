@@ -16,8 +16,11 @@ export default function CookieBanner() {
   function pushConsent(granted: boolean) {
     window.dataLayer = window.dataLayer || [];
     const state = granted ? "granted" : "denied";
-    // Native gtag consent update — required for GA4 to flip consent state
-    window.dataLayer.push("consent", "update", {
+    // Native gtag consent update — required for GA4 to flip consent state.
+    // gtag works by pushing IArguments-like arrays into dataLayer.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    function gtag(...args: unknown[]) { (window.dataLayer as any).push(args); }
+    gtag("consent", "update", {
       ad_storage: state,
       analytics_storage: state,
       ad_user_data: state,
