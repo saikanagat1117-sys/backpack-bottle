@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Backpack & Bottle — System Architecture</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --forest: #1F3A2E;
+    --forest-dark: #163127;
+    --cream: #F5EFE6;
+    --cream-dark: #E8DFCF;
+    --burnt: #D97642;
+    --burnt-dark: #B85F31;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--forest);
+    font-family: 'Inter', system-ui, sans-serif;
+    padding: 48px 24px;
+  }
+  .wrap { max-width: 1400px; margin: 0 auto; }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 42px;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.02em;
+  }
+  .sub { color: var(--burnt); font-size: 16px; margin-bottom: 36px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; }
+  .diagram {
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 4px 24px rgba(31,58,46,0.08);
+    margin-bottom: 36px;
+    overflow-x: auto;
+  }
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    margin: 48px 0 16px 0;
+    color: var(--forest);
+  }
+  .legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .legend-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    border-left: 4px solid var(--burnt);
+  }
+  .legend-card h3 {
+    margin: 0 0 6px 0;
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    color: var(--forest);
+  }
+  .legend-card p { margin: 0; font-size: 14px; color: rgba(31,58,46,0.75); line-height: 1.5; }
+  .legend-card code { background: var(--cream); padding: 2px 6px; border-radius: 4px; font-size: 12px; color: var(--burnt-dark); }
+  .footer { margin-top: 48px; text-align: center; color: rgba(31,58,46,0.5); font-size: 13px; }
+  /* Mermaid override */
+  .mermaid { font-family: 'Inter', system-ui, sans-serif !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="sub">Bologna Business School · Digital Platforms Lab · Group 3</div>
+  <h1>Backpack &amp; Bottle — System Architecture</h1>
+  <p style="font-size:18px;color:rgba(31,58,46,0.75);max-width:780px;line-height:1.55;">
+    End-to-end flow from paid ad to booking. Every box is a real piece of running infrastructure.
+  </p>
+
+  <h2>Full stack: traffic → site → tracking → email → conversion</h2>
+
+  <div class="diagram">
+    <pre class="mermaid">
+flowchart LR
+  classDef paid fill:#D97642,color:#F5EFE6,stroke:#B85F31,stroke-width:2px
+  classDef site fill:#1F3A2E,color:#F5EFE6,stroke:#163127,stroke-width:2px
+  classDef api fill:#163127,color:#F5EFE6,stroke:#000,stroke-width:2px
+  classDef track fill:#F5EFE6,color:#1F3A2E,stroke:#1F3A2E,stroke-width:2px
+  classDef email fill:#FFE6D6,color:#1F3A2E,stroke:#D97642,stroke-width:2px
+  classDef external fill:#E8DFCF,color:#1F3A2E,stroke:#1F3A2E,stroke-width:1px,stroke-dasharray: 5 5
+
+  META[Meta Ads<br/>60% budget<br/>€1,200]:::paid
+  GADS[Google Ads<br/>40% budget<br/>€800]:::paid
+  ORGANIC[Organic / Direct<br/>SEO blog · referral]:::external
+
+  META --> SITE
+  GADS --> SITE
+  ORGANIC --> SITE
+
+  SITE[Live Site<br/>backpack-bottle.vercel.app<br/>Next.js 14 · Vercel]:::site
+
+  SITE --> CONSENT{Cookie<br/>Consent?}
+  CONSENT -->|granted| TRACK[Tracking<br/>Layer]
+  CONSENT -->|denied| MODELED[Modeled<br/>traffic only]:::external
+
+  TRACK --> GA4[GA4<br/>G-FHBQE8QZM9<br/>page_view, cta_click,<br/>form_submit, etc]:::track
+  TRACK --> GTM[GTM<br/>GTM-KSN24TZ2<br/>tag manager]:::track
+  TRACK --> CLARITY[Clarity<br/>session recordings<br/>+ heatmaps]:::track
+  TRACK --> VAN[Vercel Analytics<br/>page views, referrers]:::track
+  TRACK --> VSI[Speed Insights<br/>Core Web Vitals]:::track
+
+  SITE --> FORM[Lead Form<br/>name · email · destination<br/>departure city · GDPR]
+  FORM -->|POST| API[/api/lead<br/>Vercel Function]:::api
+  API --> BREVO[Brevo Contacts API<br/>List #13]:::email
+  API --> COUPON[BB50 Coupon<br/>thank-you page<br/>+ PDF in /public]
+
+  BREVO --> AUTO[Brevo Automation<br/>Welcome series]:::email
+  AUTO -->|Day 0| E1[Email 1<br/>Welcome + BB50]:::email
+  AUTO -->|Day 3| E2[Email 2<br/>Personalized<br/>destination]:::email
+  AUTO -->|Day 7| E3[Email 3<br/>Most popular<br/>this week]:::email
+  AUTO -->|Day 60| E4[Email 4<br/>Coupon<br/>expiring soon]:::email
+
+  E1 --> BACK[Click → return<br/>to site]
+  E2 --> BACK
+  E3 --> BACK
+  E4 --> BACK
+  BACK --> SITE
+
+  GA4 --> REPORT[Reports &amp; Dashboards<br/>Realtime · Acquisition · Funnels]:::track
+  CLARITY --> REPORT
+  VAN --> REPORT
+    </pre>
+  </div>
+
+  <h2>What each piece is for</h2>
+
+  <div class="legend">
+    <div class="legend-card">
+      <h3>Vercel <code>backpack-bottle</code></h3>
+      <p>Hosts the Next.js site. Auto-deploys on every git push to main. Handles the lead-capture serverless function. Custom domain ready.</p>
+    </div>
+    <div class="legend-card">
+      <h3>GitHub <code>saikanagat1117-sys/backpack-bottle</code></h3>
+      <p>Source of truth. Connected to Vercel via OAuth — every commit triggers a preview or production build. CI-friendly.</p>
+    </div>
+    <div class="legend-card">
+      <h3>GA4 <code>G-FHBQE8QZM9</code></h3>
+      <p>Primary analytics. Captures every dataLayer event — form_submit, coupon_download, scroll_75, plus auto page_view + Enhanced Measurement (scrolls, outbound clicks, file downloads).</p>
+    </div>
+    <div class="legend-card">
+      <h3>GTM <code>GTM-KSN24TZ2</code></h3>
+      <p>Tag manager. Loads alongside GA4 for future flexibility — adding Meta Pixel, Google Ads conversion, or any other pixel without touching code.</p>
+    </div>
+    <div class="legend-card">
+      <h3>Microsoft Clarity <code>whxm989emj</code></h3>
+      <p>Free session recordings + heatmaps. Filter recordings by custom event ("show me sessions that submitted the form"). Detects rage-clicks and dead-clicks automatically.</p>
+    </div>
+    <div class="legend-card">
+      <h3>Vercel Analytics</h3>
+      <p>Top pages, top referrers, devices, countries. Instant — no setup, no scripts beyond <code>@vercel/analytics</code> already wired.</p>
+    </div>
+    <div class="legend-card">
+      <h3>Vercel Speed Insights</h3>
+      <p>Real-user Core Web Vitals (LCP, FID, CLS) from actual visitors. Critical for the "site performance" deck slide.</p>
+    </div>
+    <div class="legend-card">
+      <h3>Consent Mode v2</h3>
+      <p>GDPR-compliant cookie banner. Defaults to denied; flips to granted via <code>gtag('consent','update')</code> on accept. Keeps modeled traffic in GA4 even when users reject.</p>
+    </div>
+    <div class="legend-card">
+      <h3>Brevo Contacts API</h3>
+      <p>Every lead from <code>/api/lead</code> is POSTed to Brevo with attributes (FIRSTNAME, DEPARTURE_CITY, DESTINATION_INTEREST, LOCALE, COUPON_CODE, SIGNUP_DATE). Auto-segments leads.</p>
+    </div>
+    <div class="legend-card">
+      <h3>Brevo Automation — Welcome Series</h3>
+      <p>4-email flow over 60 days. Day 0 welcome + coupon · Day 3 personalized destination · Day 7 social proof · Day 60 expiry reminder. Personalized via merge tags.</p>
+    </div>
+    <div class="legend-card">
+      <h3>Coupon BB50 PDF</h3>
+      <p>Branded one-page PDF generated by <code>scripts/build-coupon.ts</code> using pdf-lib. Served from <code>/public/backpack-bottle-coupon-BB50.pdf</code> + attached to welcome email.</p>
+    </div>
+    <div class="legend-card">
+      <h3>Custom dataLayer events</h3>
+      <p><code>cta_click</code> · <code>destination_card_click</code> · <code>form_start</code> · <code>form_submit</code> · <code>coupon_download</code> · <code>visit_count</code> · <code>scroll_75</code> · <code>outbound_click</code> · <code>consent_update</code></p>
+    </div>
+  </div>
+
+  <h2>Lead flow — from click to booking</h2>
+
+  <div class="diagram">
+    <pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant U as User
+  participant S as Vercel Site
+  participant API as /api/lead
+  participant B as Brevo
+  participant GA as GA4
+
+  U->>S: Click Meta ad → land on /
+  S->>GA: page_view + utm_source=meta
+  S->>U: Cookie banner
+  U->>S: Accetta tutti
+  S->>GA: consent_update (granted)
+  U->>S: Scroll, click destination card
+  S->>GA: destination_card_click
+  U->>S: Submit lead form
+  S->>API: POST {email, name, destination, …}
+  API->>B: POST /v3/contacts (list 13)
+  API->>S: 200 ok + coupon: BB50
+  S->>U: redirect /grazie
+  S->>GA: form_submit + coupon_download
+  B-->>U: Email 1 (Welcome + BB50)
+  Note over B,U: Wait 3 days
+  B-->>U: Email 2 (Personalized destination)
+  Note over B,U: Wait 4 days
+  B-->>U: Email 3 (Most popular)
+  Note over B,U: Wait 53 days
+  B-->>U: Email 4 (Coupon expiring)
+  U->>S: Click email CTA → return
+  U->>S: Apply BB50 → book
+    </pre>
+  </div>
+
+  <div class="footer">
+    Backpack &amp; Bottle &middot; April 2026 &middot; Open this page in your browser, screenshot, paste into the deck.
+  </div>
+
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    themeVariables: {
+      fontFamily: 'Inter, system-ui, sans-serif',
+      primaryColor: '#1F3A2E',
+      primaryTextColor: '#F5EFE6',
+      primaryBorderColor: '#163127',
+      lineColor: '#1F3A2E',
+      secondaryColor: '#D97642',
+      tertiaryColor: '#F5EFE6',
+      background: '#ffffff',
+      mainBkg: '#1F3A2E',
+      secondBkg: '#D97642',
+      tertiaryBkg: '#F5EFE6',
+    },
+    flowchart: { curve: 'basis', padding: 20 },
+    sequence: { mirrorActors: false, boxMargin: 12, messageMargin: 40 }
+  });
+</script>
+</body>
+</html>
