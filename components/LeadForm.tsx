@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { useLocale } from "./LocaleProvider";
 import { t, destinations } from "@/lib/content";
 import { track } from "@/lib/gtm";
+import { readUTM } from "./UTMCapture";
+import Countdown from "./Countdown";
 
 export default function LeadForm() {
   const { locale } = useLocale();
@@ -44,11 +46,21 @@ export default function LeadForm() {
     const data = Object.fromEntries(fd.entries());
     setStatus("sending");
     try {
-      await fetch("/api/lead", {
+      const utm = readUTM();
+      const fbp = typeof document !== "undefined" ? document.cookie.match(/_fbp=([^;]+)/)?.[1] : undefined;
+      const fbc = typeof document !== "undefined" ? document.cookie.match(/_fbc=([^;]+)/)?.[1] : undefined;
+      const res = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, locale }),
+        body: JSON.stringify({ ...data, locale, utm, fbp, fbc }),
       });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json.ok) {
+        track("form_submit_error", { error: json.error || String(res.status) });
+        setStatus("error");
+        return;
+      }
+      // Only count conversion AFTER server confirms success (was firing on any fetch resolution before)
       track("form_submit", { form: "coupon_lead", destination: data.interest });
       track("coupon_download", { coupon_code: "BB50", value: 50, currency: "EUR" });
       router.push("/grazie");
@@ -67,6 +79,7 @@ export default function LeadForm() {
           </div>
           <h2 className="font-display text-4xl md:text-5xl leading-tight">{t.form.title[locale]}</h2>
           <p className="mt-5 text-cream/80 text-lg max-w-lg">{t.form.sub[locale]}</p>
+          <div className="mt-6"><Countdown /></div>
           <ul className="mt-8 space-y-2 text-cream/70 text-sm">
             <li>✓ {locale === "it" ? "Coupon consegnato via email in 30 secondi" : "Coupon delivered by email in 30 seconds"}</li>
             <li>✓ {locale === "it" ? "Guida PDF delle 5 destinazioni inclusa" : "5-destination PDF guide included"}</li>

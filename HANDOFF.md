@@ -2,7 +2,7 @@
 
 **Group 3 · Digital Platforms Lab · Bologna Business School**
 
-Everything that's already done is done. This file lists the steps **only you can do** (because they need your personal Google / Meta / Mailchimp accounts) — and exactly how to do them.
+Everything that's already done is done. This file lists the steps **only you can do** (because they need your personal Google / Meta / Brevo accounts) — and exactly how to do them.
 
 If you stop after step 1, you have a fully functional academic submission. Steps 2–6 take it from "demo" to "actually live in market."
 
@@ -128,11 +128,11 @@ After all tags + triggers are in: top right → **Submit** → Version name "v1 
 
 Right now `/api/lead` logs leads to Vercel function logs only. To actually capture them:
 
-#### Option A — Mailchimp (free up to 500 contacts)
+#### Option A — Brevo (free up to 500 contacts)
 1. Sign up at https://mailchimp.com (free tier).
 2. Create an audience called `Backpack & Bottle leads`.
 3. Generate a Webhook URL via Zapier or Make.com:
-   - Zapier: New Zap → Trigger = Webhooks by Zapier (Catch Hook) → copy URL → Action = Mailchimp Add/Update Subscriber.
+   - Zapier: New Zap → Trigger = Webhooks by Zapier (Catch Hook) → copy URL → Action = Brevo Add/Update Subscriber.
 4. In Vercel env vars, add: `LEAD_WEBHOOK_URL = https://hooks.zapier.com/...`
 5. Uncomment the webhook block in `app/api/lead/route.ts` (lines 26–32) and redeploy.
 
