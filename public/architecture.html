@@ -4,7 +4,8 @@
 <meta charset="utf-8" />
 <title>Backpack & Bottle — System Architecture</title>
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.5/dist/mermaid.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --forest: #1F3A2E;
@@ -21,172 +22,287 @@
     color: var(--forest);
     font-family: 'Inter', system-ui, sans-serif;
     padding: 48px 24px;
+    line-height: 1.5;
   }
   .wrap { max-width: 1400px; margin: 0 auto; }
   h1 {
     font-family: 'Fraunces', serif;
-    font-size: 42px;
+    font-size: 48px;
     margin: 0 0 8px 0;
     letter-spacing: -0.02em;
+    line-height: 1.05;
   }
-  .sub { color: var(--burnt); font-size: 16px; margin-bottom: 36px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; }
+  .sub { color: var(--burnt); font-size: 13px; margin-bottom: 36px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; }
+  .intro { font-size: 18px; color: rgba(31,58,46,0.78); max-width: 780px; margin-bottom: 48px; }
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 30px;
+    margin: 56px 0 4px 0;
+    color: var(--forest);
+    font-weight: 500;
+  }
+  h2 + .h2-sub { color: var(--burnt-dark); font-size: 14px; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 600; margin-bottom: 20px; }
   .diagram {
     background: white;
     border-radius: 24px;
     padding: 40px;
     box-shadow: 0 4px 24px rgba(31,58,46,0.08);
-    margin-bottom: 36px;
+    margin-bottom: 24px;
     overflow-x: auto;
   }
-  h2 {
-    font-family: 'Fraunces', serif;
-    font-size: 28px;
-    margin: 48px 0 16px 0;
-    color: var(--forest);
-  }
-  .legend {
+  .legend-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 16px;
-    margin-top: 24px;
+    margin-top: 8px;
   }
   .legend-card {
     background: white;
     border-radius: 16px;
-    padding: 20px;
+    padding: 22px;
     border-left: 4px solid var(--burnt);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .legend-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(31,58,46,0.1);
   }
   .legend-card h3 {
     margin: 0 0 6px 0;
     font-family: 'Fraunces', serif;
     font-size: 18px;
     color: var(--forest);
+    font-weight: 500;
   }
-  .legend-card p { margin: 0; font-size: 14px; color: rgba(31,58,46,0.75); line-height: 1.5; }
+  .legend-card p { margin: 0; font-size: 14px; color: rgba(31,58,46,0.75); line-height: 1.55; }
   .legend-card code { background: var(--cream); padding: 2px 6px; border-radius: 4px; font-size: 12px; color: var(--burnt-dark); }
-  .footer { margin-top: 48px; text-align: center; color: rgba(31,58,46,0.5); font-size: 13px; }
-  /* Mermaid override */
+  .footer { margin-top: 64px; padding-top: 32px; border-top: 1px solid rgba(31,58,46,0.1); text-align: center; color: rgba(31,58,46,0.5); font-size: 13px; }
+  .detail-panel {
+    position: fixed;
+    top: 0;
+    right: -480px;
+    width: 460px;
+    max-width: 90vw;
+    height: 100vh;
+    background: white;
+    box-shadow: -8px 0 40px rgba(31,58,46,0.15);
+    padding: 40px 32px;
+    overflow-y: auto;
+    transition: right 0.3s ease;
+    z-index: 100;
+  }
+  .detail-panel.open { right: 0; }
+  .detail-panel .close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: var(--cream);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    color: var(--forest);
+  }
+  .detail-panel h3 { font-family: 'Fraunces', serif; font-size: 26px; margin: 0 0 8px 0; color: var(--forest); font-weight: 500; }
+  .detail-panel .badge { display: inline-block; background: var(--burnt); color: var(--cream); padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-bottom: 16px; }
+  .detail-panel p { margin: 0 0 14px 0; color: rgba(31,58,46,0.85); font-size: 15px; }
+  .detail-panel code { background: var(--cream); padding: 3px 8px; border-radius: 4px; font-size: 13px; color: var(--burnt-dark); }
+  .detail-panel a { color: var(--burnt); text-decoration: none; font-weight: 500; }
+  .detail-panel a:hover { text-decoration: underline; }
+  .pill { display: inline-block; background: var(--cream); color: var(--forest); padding: 4px 10px; border-radius: 12px; font-size: 12px; margin: 2px 4px 2px 0; }
+  .hint {
+    background: rgba(217,118,66,0.1);
+    border-left: 3px solid var(--burnt);
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--forest);
+    margin-bottom: 24px;
+  }
   .mermaid { font-family: 'Inter', system-ui, sans-serif !important; }
+  .mermaid svg { max-width: 100% !important; height: auto !important; }
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <div class="sub">Bologna Business School · Digital Platforms Lab · Group 3</div>
-  <h1>Backpack &amp; Bottle — System Architecture</h1>
-  <p style="font-size:18px;color:rgba(31,58,46,0.75);max-width:780px;line-height:1.55;">
-    End-to-end flow from paid ad to booking. Every box is a real piece of running infrastructure.
+  <h1>Backpack &amp; Bottle <span style="color:var(--burnt)">·</span> System Architecture</h1>
+  <p class="intro">
+    End-to-end flow from paid ad to booking. Every node is a real piece of running infrastructure.
   </p>
 
-  <h2>Full stack: traffic → site → tracking → email → conversion</h2>
+  <div class="hint">
+    <strong>Tip:</strong> click any node in the diagram below to see what it does, why it's there, and the live IDs / URLs.
+  </div>
+
+  <h2>The Stack</h2>
+  <div class="h2-sub">Traffic → Site → Tracking → Lead Capture → Email → Conversion</div>
 
   <div class="diagram">
     <pre class="mermaid">
-flowchart LR
-  classDef paid fill:#D97642,color:#F5EFE6,stroke:#B85F31,stroke-width:2px
-  classDef site fill:#1F3A2E,color:#F5EFE6,stroke:#163127,stroke-width:2px
-  classDef api fill:#163127,color:#F5EFE6,stroke:#000,stroke-width:2px
-  classDef track fill:#F5EFE6,color:#1F3A2E,stroke:#1F3A2E,stroke-width:2px
-  classDef email fill:#FFE6D6,color:#1F3A2E,stroke:#D97642,stroke-width:2px
-  classDef external fill:#E8DFCF,color:#1F3A2E,stroke:#1F3A2E,stroke-width:1px,stroke-dasharray: 5 5
+flowchart TB
+  classDef paid fill:#D97642,color:#F5EFE6,stroke:#B85F31,stroke-width:2px,font-weight:600
+  classDef site fill:#1F3A2E,color:#F5EFE6,stroke:#163127,stroke-width:2px,font-weight:600
+  classDef api fill:#163127,color:#F5EFE6,stroke:#000000,stroke-width:2px,font-weight:600
+  classDef track fill:#F5EFE6,color:#1F3A2E,stroke:#1F3A2E,stroke-width:2px,font-weight:500
+  classDef email fill:#FFE6D6,color:#1F3A2E,stroke:#D97642,stroke-width:2px,font-weight:500
+  classDef external fill:#E8DFCF,color:#1F3A2E,stroke:#1F3A2E,stroke-width:1px,stroke-dasharray: 5 5,font-weight:500
+  classDef report fill:#fff,color:#1F3A2E,stroke:#D97642,stroke-width:3px,font-weight:600
 
-  META[Meta Ads<br/>60% budget<br/>€1,200]:::paid
-  GADS[Google Ads<br/>40% budget<br/>€800]:::paid
-  ORGANIC[Organic / Direct<br/>SEO blog · referral]:::external
+  subgraph SOURCES ["TRAFFIC SOURCES — 2,000 EUR over 6 weeks"]
+    direction LR
+    META["Meta Ads<br/>60% / 1200 EUR<br/>Awareness · Lead Gen · Retargeting"]:::paid
+    GADS["Google Ads<br/>40% / 800 EUR<br/>Branded · Generic · Competitor"]:::paid
+    ORGANIC["Organic / Direct<br/>SEO blog · referral"]:::external
+  end
+
+  subgraph SITESTACK ["LIVE SITE — Next.js 14 · Vercel"]
+    SITE["backpack-bottle.vercel.app<br/>10 destinations · Italian-first · EN toggle"]:::site
+    CONSENT{"Cookie<br/>Consent?"}
+    FORM["Lead Form<br/>name · email · destination<br/>departure city · GDPR"]:::site
+    THANKYOU["/grazie<br/>BB50 reveal + PDF"]:::site
+  end
+
+  subgraph TRACKLAYER ["TRACKING LAYER — six tools, parallel"]
+    GA4["GA4<br/>G-FHBQE8QZM9<br/>primary analytics"]:::track
+    GTM["GTM<br/>GTM-KSN24TZ2<br/>tag manager"]:::track
+    CLARITY["Microsoft Clarity<br/>whxm989emj<br/>recordings + heatmaps"]:::track
+    VAN["Vercel Analytics<br/>traffic + referrers"]:::track
+    VSI["Speed Insights<br/>Core Web Vitals"]:::track
+    DLEVENTS["dataLayer events<br/>cta_click · form_submit<br/>coupon_download · scroll_75"]:::track
+  end
+
+  subgraph LEADFLOW ["LEAD CAPTURE & PERSISTENCE"]
+    API["/api/lead<br/>Vercel Function"]:::api
+    BREVO["Brevo Contacts API<br/>List #13"]:::email
+  end
+
+  subgraph EMAILFLOW ["EMAIL AUTOMATION — 60-day sequence"]
+    direction TB
+    AUTO["Brevo Automation<br/>Welcome Series"]:::email
+    E1["Email 1 — Day 0<br/>Welcome + BB50 coupon<br/>+ PDF attachment"]:::email
+    E2["Email 2 — Day 3<br/>Personalized destination"]:::email
+    E3["Email 3 — Day 7<br/>Most popular this week"]:::email
+    E4["Email 4 — Day 60<br/>Coupon expiring"]:::email
+  end
+
+  REPORT["Reports & Dashboards<br/>Realtime · Acquisition · Funnel<br/>Heatmaps · Recordings"]:::report
 
   META --> SITE
   GADS --> SITE
   ORGANIC --> SITE
 
-  SITE[Live Site<br/>backpack-bottle.vercel.app<br/>Next.js 14 · Vercel]:::site
+  SITE --> CONSENT
+  CONSENT -->|granted| TRACKLAYER
+  CONSENT -.->|denied: modeled only| GA4
 
-  SITE --> CONSENT{Cookie<br/>Consent?}
-  CONSENT -->|granted| TRACK[Tracking<br/>Layer]
-  CONSENT -->|denied| MODELED[Modeled<br/>traffic only]:::external
+  SITE --> FORM
+  FORM -->|POST JSON| API
+  API --> BREVO
+  API --> THANKYOU
 
-  TRACK --> GA4[GA4<br/>G-FHBQE8QZM9<br/>page_view, cta_click,<br/>form_submit, etc]:::track
-  TRACK --> GTM[GTM<br/>GTM-KSN24TZ2<br/>tag manager]:::track
-  TRACK --> CLARITY[Clarity<br/>session recordings<br/>+ heatmaps]:::track
-  TRACK --> VAN[Vercel Analytics<br/>page views, referrers]:::track
-  TRACK --> VSI[Speed Insights<br/>Core Web Vitals]:::track
+  BREVO --> AUTO
+  AUTO --> E1
+  E1 --> E2
+  E2 --> E3
+  E3 --> E4
 
-  SITE --> FORM[Lead Form<br/>name · email · destination<br/>departure city · GDPR]
-  FORM -->|POST| API[/api/lead<br/>Vercel Function]:::api
-  API --> BREVO[Brevo Contacts API<br/>List #13]:::email
-  API --> COUPON[BB50 Coupon<br/>thank-you page<br/>+ PDF in /public]
+  E1 -.->|click| SITE
+  E2 -.->|click| SITE
+  E3 -.->|click| SITE
+  E4 -.->|click| SITE
 
-  BREVO --> AUTO[Brevo Automation<br/>Welcome series]:::email
-  AUTO -->|Day 0| E1[Email 1<br/>Welcome + BB50]:::email
-  AUTO -->|Day 3| E2[Email 2<br/>Personalized<br/>destination]:::email
-  AUTO -->|Day 7| E3[Email 3<br/>Most popular<br/>this week]:::email
-  AUTO -->|Day 60| E4[Email 4<br/>Coupon<br/>expiring soon]:::email
-
-  E1 --> BACK[Click → return<br/>to site]
-  E2 --> BACK
-  E3 --> BACK
-  E4 --> BACK
-  BACK --> SITE
-
-  GA4 --> REPORT[Reports &amp; Dashboards<br/>Realtime · Acquisition · Funnels]:::track
+  GA4 --> REPORT
   CLARITY --> REPORT
   VAN --> REPORT
+  GTM --> GA4
+  DLEVENTS --> GA4
+  DLEVENTS --> GTM
+  DLEVENTS --> CLARITY
+
+  click SITE call openDetail("site")
+  click META call openDetail("meta")
+  click GADS call openDetail("gads")
+  click ORGANIC call openDetail("organic")
+  click GA4 call openDetail("ga4")
+  click GTM call openDetail("gtm")
+  click CLARITY call openDetail("clarity")
+  click VAN call openDetail("van")
+  click VSI call openDetail("vsi")
+  click DLEVENTS call openDetail("dlevents")
+  click CONSENT call openDetail("consent")
+  click FORM call openDetail("form")
+  click API call openDetail("api")
+  click BREVO call openDetail("brevo")
+  click AUTO call openDetail("auto")
+  click E1 call openDetail("e1")
+  click E2 call openDetail("e2")
+  click E3 call openDetail("e3")
+  click E4 call openDetail("e4")
+  click THANKYOU call openDetail("thankyou")
+  click REPORT call openDetail("report")
     </pre>
   </div>
 
-  <h2>What each piece is for</h2>
+  <h2>What each piece does</h2>
+  <div class="h2-sub">Click cards below or nodes above for full detail</div>
 
-  <div class="legend">
-    <div class="legend-card">
+  <div class="legend-grid">
+    <div class="legend-card" onclick="openDetail('site')">
       <h3>Vercel <code>backpack-bottle</code></h3>
-      <p>Hosts the Next.js site. Auto-deploys on every git push to main. Handles the lead-capture serverless function. Custom domain ready.</p>
+      <p>Hosts the Next.js site. Auto-deploys on every git push to main. Handles the lead-capture serverless function.</p>
     </div>
-    <div class="legend-card">
-      <h3>GitHub <code>saikanagat1117-sys/backpack-bottle</code></h3>
-      <p>Source of truth. Connected to Vercel via OAuth — every commit triggers a preview or production build. CI-friendly.</p>
-    </div>
-    <div class="legend-card">
+    <div class="legend-card" onclick="openDetail('ga4')">
       <h3>GA4 <code>G-FHBQE8QZM9</code></h3>
-      <p>Primary analytics. Captures every dataLayer event — form_submit, coupon_download, scroll_75, plus auto page_view + Enhanced Measurement (scrolls, outbound clicks, file downloads).</p>
+      <p>Primary analytics. Captures every dataLayer event — form_submit, coupon_download, scroll_75, plus auto page_view.</p>
     </div>
-    <div class="legend-card">
+    <div class="legend-card" onclick="openDetail('gtm')">
       <h3>GTM <code>GTM-KSN24TZ2</code></h3>
-      <p>Tag manager. Loads alongside GA4 for future flexibility — adding Meta Pixel, Google Ads conversion, or any other pixel without touching code.</p>
+      <p>Tag manager. For future Meta Pixel + Google Ads conversion tagging without touching code.</p>
     </div>
-    <div class="legend-card">
+    <div class="legend-card" onclick="openDetail('clarity')">
       <h3>Microsoft Clarity <code>whxm989emj</code></h3>
-      <p>Free session recordings + heatmaps. Filter recordings by custom event ("show me sessions that submitted the form"). Detects rage-clicks and dead-clicks automatically.</p>
+      <p>Free session recordings + heatmaps. Filter by custom event. Detects rage-clicks and dead-clicks.</p>
     </div>
-    <div class="legend-card">
+    <div class="legend-card" onclick="openDetail('van')">
       <h3>Vercel Analytics</h3>
-      <p>Top pages, top referrers, devices, countries. Instant — no setup, no scripts beyond <code>@vercel/analytics</code> already wired.</p>
+      <p>Top pages, top referrers, devices, countries. Instant — no setup beyond <code>@vercel/analytics</code>.</p>
     </div>
-    <div class="legend-card">
+    <div class="legend-card" onclick="openDetail('vsi')">
       <h3>Vercel Speed Insights</h3>
-      <p>Real-user Core Web Vitals (LCP, FID, CLS) from actual visitors. Critical for the "site performance" deck slide.</p>
+      <p>Real-user Core Web Vitals (LCP, FID, CLS) for the "site performance" deck slide.</p>
     </div>
-    <div class="legend-card">
+    <div class="legend-card" onclick="openDetail('consent')">
       <h3>Consent Mode v2</h3>
-      <p>GDPR-compliant cookie banner. Defaults to denied; flips to granted via <code>gtag('consent','update')</code> on accept. Keeps modeled traffic in GA4 even when users reject.</p>
+      <p>GDPR-compliant cookie banner. Denied default; flips to granted via <code>gtag('consent','update')</code> on accept.</p>
     </div>
-    <div class="legend-card">
+    <div class="legend-card" onclick="openDetail('api')">
+      <h3>API <code>/api/lead</code></h3>
+      <p>Vercel serverless function. Validates the form, logs the lead, fires Brevo contact creation, returns BB50 coupon.</p>
+    </div>
+    <div class="legend-card" onclick="openDetail('brevo')">
       <h3>Brevo Contacts API</h3>
-      <p>Every lead from <code>/api/lead</code> is POSTed to Brevo with attributes (FIRSTNAME, DEPARTURE_CITY, DESTINATION_INTEREST, LOCALE, COUPON_CODE, SIGNUP_DATE). Auto-segments leads.</p>
+      <p>Every lead lands in list 13 with attributes (FIRSTNAME, DEPARTURE_CITY, DESTINATION_INTEREST, LOCALE, COUPON_CODE).</p>
     </div>
-    <div class="legend-card">
-      <h3>Brevo Automation — Welcome Series</h3>
-      <p>4-email flow over 60 days. Day 0 welcome + coupon · Day 3 personalized destination · Day 7 social proof · Day 60 expiry reminder. Personalized via merge tags.</p>
+    <div class="legend-card" onclick="openDetail('auto')">
+      <h3>Brevo Automation</h3>
+      <p>4-email flow over 60 days. Welcome (D0) · Personalized (D3) · Social proof (D7) · Expiring (D60).</p>
     </div>
-    <div class="legend-card">
+    <div class="legend-card" onclick="openDetail('thankyou')">
       <h3>Coupon BB50 PDF</h3>
-      <p>Branded one-page PDF generated by <code>scripts/build-coupon.ts</code> using pdf-lib. Served from <code>/public/backpack-bottle-coupon-BB50.pdf</code> + attached to welcome email.</p>
+      <p>Branded one-page PDF generated by <code>scripts/build-coupon.ts</code>. In <code>/public/backpack-bottle-coupon-BB50.pdf</code>.</p>
     </div>
-    <div class="legend-card">
-      <h3>Custom dataLayer events</h3>
-      <p><code>cta_click</code> · <code>destination_card_click</code> · <code>form_start</code> · <code>form_submit</code> · <code>coupon_download</code> · <code>visit_count</code> · <code>scroll_75</code> · <code>outbound_click</code> · <code>consent_update</code></p>
+    <div class="legend-card" onclick="openDetail('dlevents')">
+      <h3>dataLayer events</h3>
+      <p><code>cta_click</code> · <code>form_submit</code> · <code>coupon_download</code> · <code>visit_count</code> · <code>scroll_75</code> · <code>outbound_click</code></p>
     </div>
   </div>
 
-  <h2>Lead flow — from click to booking</h2>
+  <h2>Lead flow — click to booking</h2>
+  <div class="h2-sub">Sequence over 60 days, from impression to revenue</div>
 
   <div class="diagram">
     <pre class="mermaid">
@@ -194,21 +310,21 @@ sequenceDiagram
   autonumber
   participant U as User
   participant S as Vercel Site
-  participant API as /api/lead
+  participant API as api/lead
   participant B as Brevo
   participant GA as GA4
 
-  U->>S: Click Meta ad → land on /
+  U->>S: Click Meta ad → land on home
   S->>GA: page_view + utm_source=meta
-  S->>U: Cookie banner
-  U->>S: Accetta tutti
+  S->>U: Cookie banner shown
+  U->>S: Accept all
   S->>GA: consent_update (granted)
   U->>S: Scroll, click destination card
   S->>GA: destination_card_click
   U->>S: Submit lead form
-  S->>API: POST {email, name, destination, …}
-  API->>B: POST /v3/contacts (list 13)
-  API->>S: 200 ok + coupon: BB50
+  S->>API: POST email, name, destination, ...
+  API->>B: POST v3/contacts (list 13)
+  API-->>S: 200 ok + coupon BB50
   S->>U: redirect /grazie
   S->>GA: form_submit + coupon_download
   B-->>U: Email 1 (Welcome + BB50)
@@ -217,36 +333,78 @@ sequenceDiagram
   Note over B,U: Wait 4 days
   B-->>U: Email 3 (Most popular)
   Note over B,U: Wait 53 days
-  B-->>U: Email 4 (Coupon expiring)
+  B-->>U: Email 4 (Expiring soon)
   U->>S: Click email CTA → return
   U->>S: Apply BB50 → book
     </pre>
   </div>
 
   <div class="footer">
-    Backpack &amp; Bottle &middot; April 2026 &middot; Open this page in your browser, screenshot, paste into the deck.
+    Backpack &amp; Bottle · April 2026 · Open this page in your browser. Press <kbd>Cmd+Shift+P</kbd> in DevTools and choose <em>Capture full size screenshot</em> for a deck-ready image.
   </div>
 
 </div>
 
+<div class="detail-panel" id="detail">
+  <button class="close" onclick="closeDetail()">×</button>
+  <div id="detail-body"></div>
+</div>
+
 <script>
+  const DETAILS = {
+    site: { type: "Site", title: "Live site — Next.js 14 on Vercel", body: `<p>The site is deployed at <a href="https://backpack-bottle.vercel.app" target="_blank">backpack-bottle.vercel.app</a> and auto-rebuilds on every push to <code>main</code>.</p><p>10 curated destinations (Rome, Barcelona, Amsterdam, Lisbon, Prague, Paris, Vienna, Berlin, Copenhagen, Athens). Italian-first with EN toggle. Mobile-first responsive. Image-led hero with destination thumbnails.</p><p><span class="pill">Next.js 14</span><span class="pill">TypeScript</span><span class="pill">Tailwind</span><span class="pill">Static export</span></p>` },
+    meta: { type: "Paid", title: "Meta Ads — 1200 EUR / 60%", body: `<p>Three campaigns inside the Meta allocation:</p><p><strong>Awareness (300 EUR / 25%):</strong> video-led, hero shots of all 10 destinations, no offer mentioned. Audience: Italians 25–39 with travel + premium consumer affinity.</p><p><strong>Lead Gen (600 EUR / 50%):</strong> static + carousel ads featuring BB50, optimized for lead form opens, lookalike audiences from any pageview.</p><p><strong>Retargeting (300 EUR / 25%):</strong> warm audiences only — anyone who visited but didn't submit. Dynamic destination cards + 90-day expiry urgency.</p>` },
+    gads: { type: "Paid", title: "Google Ads — 800 EUR / 40%", body: `<p>Three campaigns inside the Google allocation:</p><p><strong>Branded (80 EUR / 10%):</strong> "backpack and bottle" + misspellings. Defensive, very high CTR.</p><p><strong>Generic Travel (480 EUR / 60%):</strong> "weekend europa offerte", "voli + hotel barcellona", "city break italia 2026". Most volume sits here.</p><p><strong>Competitor (240 EUR / 30%):</strong> "booking weekend europa", "expedia city break". Deep-funnel intent.</p><p>Display + Performance Max excluded — too broad for budget.</p>` },
+    organic: { type: "Free", title: "Organic & Direct", body: `<p>3 SEO blog posts published April 28 to seed organic traffic:</p><p><span class="pill">Weekend Barcellona 3 giorni</span><span class="pill">Quando prenotare voli Europa</span><span class="pill">5 destinazioni europee sotto 400</span></p><p>Plus referral and direct traffic from word-of-mouth + LinkedIn project share.</p>` },
+    ga4: { type: "Tracking", title: "Google Analytics 4 — primary analytics", body: `<p>Property ID: <code>G-FHBQE8QZM9</code> (account: Kanagat / property: backpwb).</p><p>Captures every <code>dataLayer</code> event automatically: page_view, cta_click, form_start, form_submit, coupon_download, visit_count, scroll_75, outbound_click, consent_update.</p><p>Wired both via direct gtag.js (in <code>components/GA4.tsx</code>) and via GTM container, deduplicated by client ID.</p><p><a href="https://analytics.google.com" target="_blank">Open GA4 →</a></p>` },
+    gtm: { type: "Tracking", title: "Google Tag Manager", body: `<p>Container: <code>GTM-KSN24TZ2</code></p><p>Loaded alongside GA4 for future flexibility — adding Meta Pixel, Google Ads conversion tags, or any other pixel without code changes.</p><p>Currently container is empty (Phase 2). Tags to add when ready: GA4 events router, Meta Pixel base + Lead event, Google Ads conversion (coupon_download, value 50 EUR).</p>` },
+    clarity: { type: "Tracking", title: "Microsoft Clarity", body: `<p>Project ID: <code>whxm989emj</code></p><p>Free session recordings and heatmaps. Filter recordings by custom dataLayer events (e.g., "show me sessions that submitted the form").</p><p>Auto-detects: rage-clicks, dead-clicks, excessive scrolling, JavaScript errors. Critical for finding UX friction.</p><p><a href="https://clarity.microsoft.com" target="_blank">Open Clarity →</a></p>` },
+    van: { type: "Tracking", title: "Vercel Analytics", body: `<p>Lightweight visitor analytics built into the hosting platform.</p><p>Tracks: page views, top pages, top referrers, top countries, devices, browsers. Free up to 2,500 events/month.</p><p>Wired via <code>@vercel/analytics</code> package in <code>app/layout.tsx</code>.</p>` },
+    vsi: { type: "Tracking", title: "Vercel Speed Insights", body: `<p>Real-user Core Web Vitals (LCP, FID, CLS) collected from actual visitors.</p><p>Used for the deck's site-performance slide and to spot regressions after deploys.</p><p>Wired via <code>@vercel/speed-insights</code>.</p>` },
+    dlevents: { type: "Tracking", title: "Custom dataLayer events", body: `<p>The single integration point for all analytics. Defined in <code>lib/gtm.ts</code>.</p><p>Events: <code>page_view</code>, <code>cta_click</code>, <code>destination_card_click</code>, <code>form_start</code>, <code>form_submit</code>, <code>coupon_download</code>, <code>visit_count</code>, <code>scroll_75</code>, <code>outbound_click</code>, <code>consent_update</code>, <code>rage_click</code>, <code>reading_time</code>.</p><p>Each event also mirrors to Microsoft Clarity for filterable session recording.</p>` },
+    consent: { type: "Compliance", title: "Cookie Consent (GDPR / Mode v2)", body: `<p>Component: <code>components/CookieBanner.tsx</code>. Defaults all consent flags to denied. On accept, fires <code>gtag('consent', 'update', {...granted})</code>.</p><p>Choice persisted in <code>localStorage.bb_consent</code>. Flips ad_storage, analytics_storage, ad_user_data, ad_personalization in lockstep.</p><p>Modeled traffic still captured by GA4 even when denied — Google's behavioral modeling fills the gap.</p>` },
+    form: { type: "Site", title: "Lead Form", body: `<p>Fields: name, email, departure city dropdown, destination interest dropdown, GDPR consent checkbox.</p><p>Mobile-responsive. GTM events fire on first focus (<code>form_start</code>), submit, and success.</p><p>Posts JSON to <code>/api/lead</code>. On 200 response, redirects to <code>/grazie</code> with the BB50 reveal.</p>` },
+    api: { type: "Backend", title: "API route — /api/lead", body: `<p>File: <code>app/api/lead/route.ts</code>. Vercel serverless function (Node runtime).</p><p>Validates email + consent. Logs the lead. POSTs to Brevo Contacts API to create/update the contact in list 13. Returns <code>{ ok: true, coupon: "BB50" }</code>.</p><p>Brevo failure does not block the user response — coupon still delivered, error logged.</p>` },
+    brevo: { type: "Email", title: "Brevo Contacts", body: `<p>List ID: <strong>13</strong> (Backpack & Bottle Leads).</p><p>Attributes saved per contact: FIRSTNAME, DEPARTURE_CITY, DESTINATION_INTEREST, LOCALE, COUPON_CODE, SIGNUP_SOURCE, SIGNUP_DATE.</p><p>Used for: list segmentation (e.g., "everyone who picked Lisbon"), automation entry trigger, and one-off campaign blasts.</p>` },
+    auto: { type: "Email", title: "Brevo Automation — Welcome Series", body: `<p>4 emails over 60 days, triggered when a contact is added to list 13.</p><p><strong>Day 0:</strong> Welcome + BB50 coupon (template 40)<br/><strong>Day 3:</strong> Personalized destination (template 42)<br/><strong>Day 7:</strong> Most popular this week (template 41)<br/><strong>Day 60:</strong> Coupon expiring (template 43)</p><p>All branded forest/cream/burnt-orange. Personalized via merge tags.</p>` },
+    e1: { type: "Email", title: "Email 1 — Welcome", body: `<p><strong>Sent:</strong> Day 0 (immediately after signup)<br/><strong>Subject:</strong> Il tuo coupon BB50 è qui ✈️<br/><strong>Template ID:</strong> 40</p><p>Delivers the BB50 coupon prominently. Lists all 10 destinations with prices. Attaches the branded PDF coupon.</p>` },
+    e2: { type: "Email", title: "Email 2 — Personalized destination", body: `<p><strong>Sent:</strong> Day 3<br/><strong>Subject:</strong> Hai 87 giorni per usare il tuo €50 di sconto<br/><strong>Template ID:</strong> 42</p><p>Uses <code>{{contact.DESTINATION_INTEREST}}</code> merge tag to surface the city the user picked. Shows 3 packages for that city. CTA back to the destination page.</p>` },
+    e3: { type: "Email", title: "Email 3 — Most popular", body: `<p><strong>Sent:</strong> Day 7<br/><strong>Subject:</strong> Le 3 città più richieste questa settimana<br/><strong>Template ID:</strong> 41</p><p>Social proof angle. Top 3 destinations with mock-data percentages. Urgency: 83 days left on coupon.</p>` },
+    e4: { type: "Email", title: "Email 4 — Coupon expiring", body: `<p><strong>Sent:</strong> Day 60<br/><strong>Subject:</strong> Il tuo coupon BB50 scade tra 30 giorni<br/><strong>Template ID:</strong> 43</p><p>Last-chance reactivation. Personalized to the user's destination interest. Hard CTA to book.</p>` },
+    thankyou: { type: "Site", title: "Thank-you page + Coupon PDF", body: `<p>Page: <code>/grazie</code>. Big BB50 reveal in burnt orange. Download CTA for the branded PDF.</p><p>PDF generated by <code>scripts/build-coupon.ts</code> using pdf-lib. Forest background, cream accent bar, BB50 in 64pt burnt orange. Lists all 10 destinations + T&Cs.</p><p>Served from <code>/public/backpack-bottle-coupon-BB50.pdf</code>.</p>` },
+    report: { type: "Output", title: "Reports & Dashboards", body: `<p>Three places where data is consumed:</p><p><strong>GA4 → Reports → Realtime / Acquisition / Engagement / Funnel</strong> — primary daily monitoring.</p><p><strong>Vercel Analytics tab</strong> — quick visitor stats.</p><p><strong>Microsoft Clarity</strong> — session recordings + heatmaps for UX insight.</p>` },
+  };
+
+  function openDetail(key) {
+    const d = DETAILS[key];
+    if (!d) return;
+    const body = document.getElementById("detail-body");
+    body.innerHTML = '<span class="badge">' + d.type + '</span><h3>' + d.title + '</h3>' + d.body;
+    document.getElementById("detail").classList.add("open");
+  }
+  function closeDetail() {
+    document.getElementById("detail").classList.remove("open");
+  }
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeDetail(); });
+
   mermaid.initialize({
     startOnLoad: true,
-    theme: 'base',
+    securityLevel: "loose",
+    theme: "base",
     themeVariables: {
-      fontFamily: 'Inter, system-ui, sans-serif',
-      primaryColor: '#1F3A2E',
-      primaryTextColor: '#F5EFE6',
-      primaryBorderColor: '#163127',
-      lineColor: '#1F3A2E',
-      secondaryColor: '#D97642',
-      tertiaryColor: '#F5EFE6',
-      background: '#ffffff',
-      mainBkg: '#1F3A2E',
-      secondBkg: '#D97642',
-      tertiaryBkg: '#F5EFE6',
+      fontFamily: "Inter, system-ui, sans-serif",
+      primaryColor: "#1F3A2E",
+      primaryTextColor: "#F5EFE6",
+      primaryBorderColor: "#163127",
+      lineColor: "#1F3A2E",
+      secondaryColor: "#D97642",
+      tertiaryColor: "#F5EFE6",
+      background: "#ffffff",
+      clusterBkg: "#F5EFE6",
+      clusterBorder: "#1F3A2E",
+      titleColor: "#1F3A2E",
     },
-    flowchart: { curve: 'basis', padding: 20 },
+    flowchart: { curve: "basis", padding: 24, nodeSpacing: 50, rankSpacing: 70, htmlLabels: true },
     sequence: { mirrorActors: false, boxMargin: 12, messageMargin: 40 }
   });
 </script>
