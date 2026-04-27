@@ -13,7 +13,7 @@ export default function GA4() {
       <Script id="ga4-init" strategy="afterInteractive">
         {`
           window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
+          window.gtag = window.gtag || function(){window.dataLayer.push(arguments);}
           gtag('js', new Date());
           gtag('config', '${GA4_ID}', {
             send_page_view: true,

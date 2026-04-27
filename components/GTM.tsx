@@ -7,7 +7,7 @@ export function GTMHead() {
       <Script id="gtm-consent-default" strategy="beforeInteractive">
         {`
           window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
+          window.gtag = window.gtag || function(){window.dataLayer.push(arguments);}
           gtag('consent', 'default', {
             ad_storage: 'denied',
             analytics_storage: 'denied',
