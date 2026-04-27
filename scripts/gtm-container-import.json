@@ -823,26 +823,6 @@
     ],
     "tag": [
       {
-        "tagId": "200",
-        "name": "GA4 - Configuration",
-        "type": "googtag",
-        "parameter": [
-          {
-            "type": "TEMPLATE",
-            "key": "tagId",
-            "value": "{{CONST - GA4 Measurement ID}}"
-          },
-          {
-            "type": "BOOLEAN",
-            "key": "configSettingsTable",
-            "value": "false"
-          }
-        ],
-        "firingTriggerId": [
-          "100"
-        ]
-      },
-      {
         "tagId": "201",
         "name": "GA4 - cta_click",
         "type": "gaawe",
@@ -856,42 +836,6 @@
             "type": "TEMPLATE",
             "key": "measurementId",
             "value": "{{CONST - GA4 Measurement ID}}"
-          },
-          {
-            "type": "LIST",
-            "key": "eventParameters",
-            "list": [
-              {
-                "type": "MAP",
-                "map": [
-                  {
-                    "type": "TEMPLATE",
-                    "key": "name",
-                    "value": "location"
-                  },
-                  {
-                    "type": "TEMPLATE",
-                    "key": "value",
-                    "value": "{{DLV - location}}"
-                  }
-                ]
-              },
-              {
-                "type": "MAP",
-                "map": [
-                  {
-                    "type": "TEMPLATE",
-                    "key": "name",
-                    "value": "label"
-                  },
-                  {
-                    "type": "TEMPLATE",
-                    "key": "value",
-                    "value": "{{DLV - label}}"
-                  }
-                ]
-              }
-            ]
           }
         ],
         "firingTriggerId": [
@@ -912,27 +856,6 @@
             "type": "TEMPLATE",
             "key": "measurementId",
             "value": "{{CONST - GA4 Measurement ID}}"
-          },
-          {
-            "type": "LIST",
-            "key": "eventParameters",
-            "list": [
-              {
-                "type": "MAP",
-                "map": [
-                  {
-                    "type": "TEMPLATE",
-                    "key": "name",
-                    "value": "form"
-                  },
-                  {
-                    "type": "TEMPLATE",
-                    "key": "value",
-                    "value": "{{DLV - form}}"
-                  }
-                ]
-              }
-            ]
           }
         ],
         "firingTriggerId": [
@@ -953,42 +876,6 @@
             "type": "TEMPLATE",
             "key": "measurementId",
             "value": "{{CONST - GA4 Measurement ID}}"
-          },
-          {
-            "type": "LIST",
-            "key": "eventParameters",
-            "list": [
-              {
-                "type": "MAP",
-                "map": [
-                  {
-                    "type": "TEMPLATE",
-                    "key": "name",
-                    "value": "destination"
-                  },
-                  {
-                    "type": "TEMPLATE",
-                    "key": "value",
-                    "value": "{{DLV - destination}}"
-                  }
-                ]
-              },
-              {
-                "type": "MAP",
-                "map": [
-                  {
-                    "type": "TEMPLATE",
-                    "key": "name",
-                    "value": "form"
-                  },
-                  {
-                    "type": "TEMPLATE",
-                    "key": "value",
-                    "value": "{{DLV - form}}"
-                  }
-                ]
-              }
-            ]
           }
         ],
         "firingTriggerId": [
@@ -1009,57 +896,6 @@
             "type": "TEMPLATE",
             "key": "measurementId",
             "value": "{{CONST - GA4 Measurement ID}}"
-          },
-          {
-            "type": "LIST",
-            "key": "eventParameters",
-            "list": [
-              {
-                "type": "MAP",
-                "map": [
-                  {
-                    "type": "TEMPLATE",
-                    "key": "name",
-                    "value": "value"
-                  },
-                  {
-                    "type": "TEMPLATE",
-                    "key": "value",
-                    "value": "{{DLV - value}}"
-                  }
-                ]
-              },
-              {
-                "type": "MAP",
-                "map": [
-                  {
-                    "type": "TEMPLATE",
-                    "key": "name",
-                    "value": "currency"
-                  },
-                  {
-                    "type": "TEMPLATE",
-                    "key": "value",
-                    "value": "{{DLV - currency}}"
-                  }
-                ]
-              },
-              {
-                "type": "MAP",
-                "map": [
-                  {
-                    "type": "TEMPLATE",
-                    "key": "name",
-                    "value": "coupon_code"
-                  },
-                  {
-                    "type": "TEMPLATE",
-                    "key": "value",
-                    "value": "{{DLV - coupon_code}}"
-                  }
-                ]
-              }
-            ]
           }
         ],
         "firingTriggerId": [
@@ -1080,27 +916,6 @@
             "type": "TEMPLATE",
             "key": "measurementId",
             "value": "{{CONST - GA4 Measurement ID}}"
-          },
-          {
-            "type": "LIST",
-            "key": "eventParameters",
-            "list": [
-              {
-                "type": "MAP",
-                "map": [
-                  {
-                    "type": "TEMPLATE",
-                    "key": "name",
-                    "value": "destination"
-                  },
-                  {
-                    "type": "TEMPLATE",
-                    "key": "value",
-                    "value": "{{DLV - destination}}"
-                  }
-                ]
-              }
-            ]
           }
         ],
         "firingTriggerId": [
@@ -1121,27 +936,6 @@
             "type": "TEMPLATE",
             "key": "measurementId",
             "value": "{{CONST - GA4 Measurement ID}}"
-          },
-          {
-            "type": "LIST",
-            "key": "eventParameters",
-            "list": [
-              {
-                "type": "MAP",
-                "map": [
-                  {
-                    "type": "TEMPLATE",
-                    "key": "name",
-                    "value": "destination"
-                  },
-                  {
-                    "type": "TEMPLATE",
-                    "key": "value",
-                    "value": "{{DLV - destination}}"
-                  }
-                ]
-              }
-            ]
           }
         ],
         "firingTriggerId": [
@@ -1242,42 +1036,6 @@
             "type": "TEMPLATE",
             "key": "measurementId",
             "value": "{{CONST - GA4 Measurement ID}}"
-          },
-          {
-            "type": "LIST",
-            "key": "eventParameters",
-            "list": [
-              {
-                "type": "MAP",
-                "map": [
-                  {
-                    "type": "TEMPLATE",
-                    "key": "name",
-                    "value": "value"
-                  },
-                  {
-                    "type": "TEMPLATE",
-                    "key": "value",
-                    "value": "{{DLV - value}}"
-                  }
-                ]
-              },
-              {
-                "type": "MAP",
-                "map": [
-                  {
-                    "type": "TEMPLATE",
-                    "key": "name",
-                    "value": "currency"
-                  },
-                  {
-                    "type": "TEMPLATE",
-                    "key": "value",
-                    "value": "EUR"
-                  }
-                ]
-              }
-            ]
           }
         ],
         "firingTriggerId": [
@@ -1377,51 +1135,6 @@
         ],
         "firingTriggerId": [
           "103"
-        ]
-      },
-      {
-        "tagId": "400",
-        "name": "Google Ads - Conversion (coupon_download)",
-        "type": "awct",
-        "parameter": [
-          {
-            "type": "TEMPLATE",
-            "key": "conversionId",
-            "value": "{{CONST - Google Ads Conversion ID}}"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "conversionLabel",
-            "value": "{{CONST - Google Ads Conversion Label}}"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "conversionValue",
-            "value": "{{DLV - value}}"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "currencyCode",
-            "value": "{{DLV - currency}}"
-          }
-        ],
-        "firingTriggerId": [
-          "105"
-        ]
-      },
-      {
-        "tagId": "401",
-        "name": "Google Ads - Remarketing",
-        "type": "sp",
-        "parameter": [
-          {
-            "type": "TEMPLATE",
-            "key": "conversionId",
-            "value": "{{CONST - Google Ads Conversion ID}}"
-          }
-        ],
-        "firingTriggerId": [
-          "100"
         ]
       }
     ]
