@@ -23,6 +23,7 @@ export default function Footer() {
             <li><Link href="/blog">{t.nav.blog[locale]}</Link></li>
             <li><Link href="/measurement">{locale === "it" ? "Piano di misurazione" : "Measurement plan"}</Link></li>
             <li><Link href="/stack">{locale === "it" ? "Stack tecnologico" : "Technology stack"}</Link></li>
+            <li><Link href="/dashboard">{locale === "it" ? "Dashboard campagna" : "Campaign dashboard"}</Link></li>
           </ul>
         </div>
         <div>

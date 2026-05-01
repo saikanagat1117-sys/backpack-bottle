@@ -6,7 +6,7 @@ const SITE = "https://backpack-bottle.vercel.app";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const staticRoutes = ["", "/blog", "/privacy", "/measurement", "/stack"].map((p) => ({
+  const staticRoutes = ["", "/blog", "/privacy", "/measurement", "/stack", "/dashboard"].map((p) => ({
     url: `${SITE}${p}`,
     lastModified: now,
     changeFrequency: "weekly" as const,
