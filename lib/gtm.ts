@@ -57,3 +57,6 @@ export const trackNewsletterSignup = (placement: string) =>
 
 export const trackCurrencyChange = (currency: string) =>
   track("currency_change", { currency });
+
+export const trackConsentChoice = (choice: "accept" | "reject", locale?: string) =>
+  track("consent_choice", { consent_choice: choice, consent_locale: locale });

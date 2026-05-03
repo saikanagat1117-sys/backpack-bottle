@@ -42,6 +42,15 @@ export default function CookieBanner() {
   function decide(granted: boolean) {
     localStorage.setItem("bb_consent", granted ? "granted" : "denied");
     pushConsent(granted);
+    // Fire a discrete consent_choice event so GA4 can count Accept vs Reject as a Key Event.
+    // This is separate from consent_update (which sets the state). consent_choice fires only
+    // on actual user click — never on page-load restore.
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: "consent_choice",
+      consent_choice: granted ? "accept" : "reject",
+      consent_locale: locale,
+    });
     setShow(false);
   }
 
